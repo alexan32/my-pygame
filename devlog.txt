@@ -1,0 +1,18 @@
+11/30/2019
+completed collision detection for circles and squares.
+completed collision handling for 'walls'
+
+longterm objectives
+- dynamic camera. can be set to follow, stationary, jump around map?
+- environment objects: walls, doors, traps, chests, collectables.
+- create a level and file system. (can use JSON to store levels/object data?)
+
+short term objectives:
+- review collision detection. implement hitbox offset? multiple hitboxes per game objects? move collision handling to hitbox class?
+- implement sprite system for gameObjects. sprite controller object with state system? look at pygame sprites
+- environment variables for graphics settings?
+
+current objectives:
+- implement sprite system
+
+
