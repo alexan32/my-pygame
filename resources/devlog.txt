@@ -16,3 +16,10 @@ current objectives:
 - implement sprite system
 
 
+Style guide:
+-1 line after class declaration
+-class names use camelCase
+-custom modules all lowercase with no spaces or delimiters
+-varable names lowercase with underscore for delimiter
+
+

@@ -1,174 +1,81 @@
-import pygame
-import gamemath
-from controller import controller
+import logging
+import functions
+import abstractclasses
 
+# LOGGING
+logger=logging.getLogger() 
+logger.setLevel(logging.DEBUG)
 
-object_list = []            # all instantiated gameObjects 
-collision_list = []         # all instantiated gameObjects that have hitboxes
-id_counter = -1
+"""
+    the gameObject class:
 
+    material: describes how the game object should be treated in collision detection. ie 'Wall' or 'Moveable.'
+    flag: describes the type or class of object. ie 'Player', 'Enemy', or 'Trigger.'
+    id: all gameobjects instances should have a unique id. Can be used to access that instance from the gameobject_dict.
+    pos: tuple describing the position of the gameobject.
+"""
 
-def get_id():
-    global id_counter
-    id_counter += 1
-    return id_counter
+class gameObject(abstractclasses.positionClass):
 
+    def __init__(self, pos, material=None, flag=None, id=None):
+        abstractclasses.positionClass.__init__(self, pos)
+        self.material = material
+        self.flag = flag
+        if id == None:
+            self.id = functions.generate_id()
+        else:
+            self.id = id
+        functions.add_gameobject_to_dict(self)
 
-class gameObject:
-
-    def __init__(self, x, y, hitbox=None):
-        self.id = get_id()
-        object_list.append(self)
-        self.x = x
-        self.y = y
-        self.hitbox = hitbox
-        if hitbox != None:
-            self.hitbox.set_position(self.x, self.y)
-            collision_list.append(self)
-        print(str(self.id) + ' created at ' + str(self.x) + ',' + str(self.y))
-
-    def set_position(self, x, y):
-        self.x = x
-        self.y = y
-
-    def set_position_by_tuple(self, pos):
-        self.x = pos[0]
-        self.y = pos[1]
-
-    def increment_position(self, x, y):
-        self.x += x
-        self.y += y
+    def destroy(self):
+        functions.remove_gameobject_from_dict(self)
 
     def update(self, dt):
         pass
 
     def render(self):
-        if self.hitbox != None:
-            self.hitbox.render()
+        pass
 
 
-# imageObjects have an image and can be drawn to the pygame screen
-# offset variables describe the displacement of the image relative
-# to the objects x and y coordinates
 class imageObject(gameObject):
 
-    def __init__(self, screen, image, x, y, hitbox=None, sprite=None):      # get sprite system working, remove image
-        gameObject.__init__(self, x, y, hitbox=hitbox)
-        self.screen = screen                                                                  
+    def __init__(self, pos, image, material=None, flag=None, id=None):
+        gameObject.__init__(self, pos, material=material, flag=flag, id=id)
         self.image = image
-        self.sprite = sprite
+        self.image.set_position(self.x, self.y)
+
+    def increment_position(self, dx, dy):
+        gameObject.increment_position(self, dx, dy)
+        self.image.set_position(self.x, self.y)
+
+    def set_position(self, x, y):
+        gameObject.set_position(self, x, y)
+        self.image.set_position(self.x, self.y)
 
     def render(self):
-        self.image.render(self.x, self.y)
+        self.image.render()
+
+
+class spriteObject(gameObject):
+
+    def __init__(self, pos, sprite_animation, material=None, flag=None, id=None):
+        gameObject.__init__(self, pos, material=material, flag=flag, id=id)
+        self.sprite_animation = sprite_animation 
+
+    def increment_position(self, dx, dy):
+        gameObject.increment_position(self, dx, dy)
+        self.sprite_animation.set_position(self.x, self.y)
+
+    def set_position(self, x, y):
+        gameObject.set_position(self, x, y)
+        self.sprite_animation.set_position(self.x, self.y)
+
+    def render(self):
+        self.sprite_animation.render()
         gameObject.render(self)
 
-
-class mobile(imageObject):
-     
-    def __init__(self, screen, image, x, y, speed=0.2, hitbox=None, sprite=None):
-        imageObject.__init__(self, screen, image, x, y, hitbox=hitbox, sprite=sprite)
-        self.speed = speed
-
-    # moves the object a small amount, and moves the hitbox
-    def increment_position(self, x, y):
-        self.x += x
-        self.y += y
-        if self.hitbox != None:
-            self.hitbox.set_position(self.x, self.y)
-            for obj in object_list:
-                if obj != self and obj.hitbox != None:
-                    # if collision detected
-                    if self.hitbox.collides(obj.hitbox):
-                        self.handle_collision(x, y, obj.hitbox)
-
-    # logic here for what to do on collision
-    def handle_collision(self, x, y, hb):
-        pass
-
-
-class controlledObject(mobile):
-
-    def __init__(self, screen, image, x, y, controller, speed=0.2, hitbox=None, sprite=None):
-        mobile.__init__(self, screen, image, x, y, speed=speed, hitbox=hitbox, sprite=sprite)
-        self.controller = controller
-        self.input = self.controller.get_input()
-
     def update(self, dt):
-        self.input = self.controller.get_input()
+        gameObject.update(self, dt)
+        self.sprite_animation.update(dt)
 
-
-class playerObject(controlledObject):
-
-    def __init__(self, screen, image, x, y, controller, speed=0.2, hitbox=None, sprite=None):
-        controlledObject.__init__(self, screen, image, x, y, controller, speed=speed, hitbox=hitbox, sprite=sprite)
-
-    def update(self, dt):
-        controlledObject.update(self, dt)
-        if self.input['left']: 
-            self.increment_position(-self.speed * dt, 0)
-        if self.input['right']:
-            self.increment_position(self.speed * dt, 0)
-        if self.input['up']:
-            self.increment_position(0, -self.speed * dt)
-        if self.input['down']:
-            self.increment_position(0, self.speed * dt)
-
-    def handle_collision(self, x, y, hb):
-        if self.hitbox.shape == 'circle':
-            if hb.shape == 'rectangle':
-                self.circle_on_rectangle(x, y, hb)
-            elif hb.shape == 'circle':
-                self.circle_on_circle(x, y, hb)
-        elif self.hitbox.shape == 'rectangle':
-            if hb.shape == 'rectangle':
-                self.rectangle_on_rectangle(x, y, hb)
-            elif hb.shape == 'circle':
-                self.rectangle_on_circle(x, y, hb)
-
-    def rectangle_on_circle(self, x, y, hb):
-        if hb.property_flag == 'wall':
-            closest_point = gamemath.closest_point_in_rectangle(hb.get_position(), self.hitbox.rect)
-            # calculate the angle:
-            theta = gamemath.radians_between_two_points(closest_point, hb.get_position())
-             # calculate the distance of the intersect:
-            d = hb.radius - gamemath.distance_between_two_points(closest_point, hb.get_position())
-            # move back d
-            xy = gamemath.get_xy_move(theta)
-            self.hitbox.increment_position(xy[0]*-d, xy[1]*-d)
-            self.set_position_by_tuple(self.hitbox.get_position())
-
-    def circle_on_rectangle(self, x, y, hb):
-        if hb.property_flag == 'wall':
-            closest_point = gamemath.closest_point_in_rectangle(self.hitbox.get_position(), hb.rect)
-            # calculate the angle:
-            theta = gamemath.radians_between_two_points(self.hitbox.get_position(), closest_point)
-            # calculate the distance of the intersect:
-            d = self.hitbox.radius - gamemath.distance_between_two_points(self.hitbox.get_position(), closest_point)
-            # move back d
-            xy = gamemath.get_xy_move(theta)
-            self.hitbox.increment_position(xy[0]*-d, xy[1]*-d)
-            self.set_position_by_tuple(self.hitbox.get_position())
-
-    def circle_on_circle(self, x, y, hb):
-        if hb.property_flag == 'wall':
-            # calculate the angle:
-            theta = gamemath.radians_between_two_points(self.hitbox.get_position(), hb.get_position())
-            # calculate the distance of the intersect:
-            d = hb.radius + self.hitbox.radius - gamemath.distance_between_two_points(self.hitbox.get_position(), hb.get_position())
-            # move back d
-            xy = gamemath.get_xy_move(theta)
-            self.hitbox.increment_position(xy[0]*-d, xy[1]*-d)
-            self.set_position_by_tuple(self.hitbox.get_position())
-
-    def rectangle_on_rectangle(self, x, y, hb):
-        if hb.property_flag == 'wall':
-            if x > 0: # Moving right; Hit the left side of the wall
-                self.hitbox.rect.right = hb.rect.left
-            elif x < 0: # Moving left; Hit the right side of the wall
-                self.hitbox.rect.left = hb.rect.right
-            if y > 0: # Moving down; Hit the top side of the wall
-                self.hitbox.rect.bottom = hb.rect.top
-            elif y < 0: # Moving up; Hit the bottom side of the wall
-                self.hitbox.rect.top = hb.rect.bottom
-            self.set_position_by_tuple(self.hitbox.get_position())
 
