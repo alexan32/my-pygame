@@ -1,10 +1,8 @@
 import pygame
 import logging
-import abstractclasses
-import gameobject
-import images
+from util_classes import *
+from util_functions import *
 from player import playerObject
-from controller import controller
 
 
 # LOGGING
@@ -35,13 +33,13 @@ pygame.display.set_caption(version)
 player_controller = controller()
 
 # image module
-test_img = images.image((64,0), "resources/character.png", screen)
-frames = images.strip_from_sheet("resources/knight_combined.png", 32, 32, 13)
-test_sprite = images.spriteAnimation(frames, screen)
+test_img = image((64,0), "resources/character.png", screen)
+frames = strip_from_sheet("resources/knight_combined.png", 32, 32, 13)
+test_sprite = spriteAnimation(frames, screen)
 
 # gameobject
-test_gameobj = gameobject.gameObject((0, 0))
-test_imageobj = gameobject.imageObject((160, 0), test_img)
+test_gameobj = gameObject((0, 0))
+test_imageobj = imageObject((160, 0), test_img)
 
 # player
 player = playerObject((96,96), player_controller, screen)

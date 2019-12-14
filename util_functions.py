@@ -1,11 +1,16 @@
 import logging
+import pygame
 
 # LOGGING
 logger=logging.getLogger() 
 logger.setLevel(logging.DEBUG) 
 
+# ---------------------------------------------------------------------
+# GAME OBJECTS
+# ---------------------------------------------------------------------
 
 """These variables and functions provide access to game objects"""
+
 counter = 0
 gameobject_dict = {}
 collidable_list = []
@@ -36,3 +41,19 @@ def remove_collidable_from_list(obj):
     except:
         logger.error("failed to remove '{}'from collidable_list".format(obj.id))
 
+
+# ---------------------------------------------------------------------
+# IMAGES
+# ---------------------------------------------------------------------
+
+
+"""Use this function to parse sprite sheets into frames for animation"""
+
+def strip_from_sheet(path, frame_width, frame_height, columns, rows=1):
+    frames = []
+    sheet = pygame.image.load(path)
+    for j in range(rows):
+        for i in range(columns):
+            location = (frame_width * i, frame_height*j)
+            frames.append(sheet.subsurface(pygame.Rect(location,(frame_width, frame_height))))
+    return frames

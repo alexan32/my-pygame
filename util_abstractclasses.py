@@ -1,5 +1,5 @@
 import logging
-from functions import (
+from util_functions import (
     collidable_list, 
     add_collidable_to_list
     )

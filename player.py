@@ -1,7 +1,8 @@
-from gameobject import gameObject
-from statemachines import stateMachine
-from images import (spriteState, 
-                    strip_from_sheet)
+from util_classes import (spriteState,
+                        stateMachine,
+                        gameObject)
+
+from util_functions import strip_from_sheet
 
 
 class playerObject(gameObject):
@@ -10,7 +11,6 @@ class playerObject(gameObject):
         gameObject.__init__(self, pos, id='player')
 
         self.speed = 0.05
-        self.moving = False
         self.flip_sprite = False
         self.controller = controller    # controller updated outside of class
 
