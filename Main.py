@@ -3,6 +3,7 @@ import logging
 from util_classes import *
 from util_functions import *
 from player import playerObject
+from wall import wallObject, movableObject, movableMover
 
 
 # LOGGING
@@ -32,23 +33,17 @@ pygame.display.set_caption(version)
 # OBJECT INIT
 player_controller = controller()
 
-# image module
-test_img = image((64,0), "resources/character.png", screen)
 frames = strip_from_sheet("resources/knight_combined.png", 32, 32, 13)
-test_sprite = spriteAnimation(frames, screen)
+test_sprite = spriteObject((0,0), frames, screen)
 
-# gameobject
-test_gameobj = gameObject((0, 0))
-test_imageobj = imageObject((160, 0), test_img)
+test_image = imageObject((32,0), "resources/character.png", screen)
 
-# player
 player = playerObject((96,96), player_controller, screen)
 
-#if it has an update(self, dt) it goes here
-update_list=[test_sprite, player]
+wall = wallObject((200,200), screen)
 
-# if it has a render() it goes here
-render_list=[test_img, test_sprite, player]
+movable = movableObject((200, 300), screen)
+movableTwo = movableObject((200, 332), screen)
 
 
 # GAME LOOP
@@ -64,15 +59,15 @@ while running:
 
     player_controller.update()
 
-    for obj in update_list:
-        obj.update(dt)
+    for key in gameobject_dict:
+        gameobject_dict[key].update(dt)
 
 
     # RENDER----------------------------
     screen.fill(background)
 
-    for obj in render_list:
-        obj.render()
+    for key in gameobject_dict:
+        gameobject_dict[key].render()
 
     pygame.display.update()
 
