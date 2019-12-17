@@ -1,5 +1,5 @@
 from util_classes import gameObject
-from hitbox import circle
+from hitbox import circle, rectangle
 from util_abstractclasses import collidableClass
 from util_functions import strip_from_sheet, checkForCollision
 import gamemath
@@ -10,6 +10,15 @@ class wallObject(gameObject, collidableClass):
         gameObject.__init__(self, pos, material='solid')
         collidableClass.__init__(self, circle(16, True, screen), pos)
 
+    def render(self):
+        collidableClass.render_hitbox(self)
+
+
+class rectangleWallObject(gameObject, collidableClass):
+
+    def __init__(self, pos, screen):
+        gameObject.__init__(self, pos, material='solid')
+        collidableClass.__init__(self, rectangle(32,32, True, screen), pos)
 
     def render(self):
         collidableClass.render_hitbox(self)

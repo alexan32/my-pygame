@@ -112,8 +112,7 @@ def handleCollision(objOne, objTwo):
 def physicsCollision(objOne, objTwo):
     if objOne.hitbox.shape == 'circle':
         if objTwo.hitbox.shape == 'rectangle':
-            # self.circle_on_rectangle(objOne, objTwo)
-            pass
+            return circle_on_rectangle(objOne, objTwo)
 
         elif objTwo.hitbox.shape == 'circle':
             return circle_on_circle(objOne, objTwo)
@@ -141,17 +140,17 @@ def rectangle_on_circle(self, x, y, hb):
         self.set_position_by_tuple(self.hitbox.get_position())
 
 
-def circle_on_rectangle(self, x, y, hb):
-    if hb.property_flag == 'wall':
-        closest_point = gamemath.closest_point_in_rectangle(self.hitbox.get_position(), hb.rect)
-        # calculate the angle:
-        theta = gamemath.radians_between_two_points(self.hitbox.get_position(), closest_point)
-        # calculate the distance of the intersect:
-        d = self.hitbox.radius - gamemath.distance_between_two_points(self.hitbox.get_position(), closest_point)
-        # move back d
-        xy = gamemath.get_xy_move(theta)
-        self.hitbox.increment_position(xy[0]*-d, xy[1]*-d)
-        self.set_position_by_tuple(self.hitbox.get_position())
+def circle_on_rectangle(objOne, objTwo):
+    hbOne = objOne.hitbox
+    hbTwo = objTwo.hitbox
+    closest_point = gamemath.closest_point_in_rectangle(hbOne.get_position(), hbTwo.rect)
+    # calculate the angle:
+    theta = gamemath.radians_between_two_points(hbOne.get_position(), closest_point)
+    # calculate the distance of the intersect:
+    d = hbOne.radius - gamemath.distance_between_two_points(hbOne.get_position(), closest_point)
+    # move back d
+    xy = gamemath.get_xy_move(theta)
+    return (xy, d)
 
 
 def circle_on_circle(objOne, objTwo):

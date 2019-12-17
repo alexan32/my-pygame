@@ -1,3 +1,4 @@
+import environment
 from util_classes import (spriteState,
                         stateMachine,
                         gameObject)
@@ -11,20 +12,20 @@ class playerObject(gameObject, collidableClass):
     def __init__(self, pos, controller, screen):   
         gameObject.__init__(self, pos, material='movable', id='player')
 
-        self.speed = 0.05
+        self.speed = environment.CHARACTER_SPEED
         self.controller = controller
 
         # HITBOX
         # create circle hitbox w/ radius 16, set it to render, position it with player
-        collidableClass.__init__(self, circle(10, True, screen), pos=(self.x, self.y), offset=(16,20))
+        collidableClass.__init__(self, circle(environment.CHARACTER_RADIUS, True, screen), pos=(self.x, self.y), offset=(environment.HITBOX_OFFSET_X,environment.HITBOX_OFFSET_Y))
 
         # GRAPHICS
         self.flip_sprite = False
-        frames = strip_from_sheet("resources/knight_combined.png", 32, 32, 13)
+        frames = strip_from_sheet("resources/wizard_combined.png", 32, 32, 13)
         animations = {
             'idle' : spriteState('idle', frames[:1], screen),
-            'walk' : spriteState('walk', frames[7:13], screen),
-            'attack' : spriteState('attack', frames[1:7], screen, next_state_key='idle', exit_on_finish=True)
+            'walk' : spriteState('walk', frames[1:7], screen),
+            'attack' : spriteState('attack', frames[7:13], screen, next_state_key='idle', exit_on_finish=True)
         }
         self.spriteHandler = stateMachine('idle', animations)
 
