@@ -110,7 +110,7 @@ class playerObject(gameObject, collidableClass):
                 self.targetPoint = self.path.pop(0)
                 print(self.path)
             if not self.atTargetPoint:
-                theta = gamemath.degrees_between_two_points((self.x, self.y), self.targetPoint)
+                theta = gamemath.radians_between_two_points((self.x, self.y), self.targetPoint)
                 x, y = gamemath.get_xy_move(theta)
                 x *= self.speed
                 y *= self.speed
