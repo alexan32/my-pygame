@@ -35,9 +35,9 @@ pygame.display.set_caption(version)
 # OBJECT INIT
 player_controller = controller()
 
-player = playerObject((96,96), player_controller, screen)
+player = playerObject((300,300), player_controller, screen)
 
-wall = wallObject((200,200), screen)
+# wall = wallObject((200,200), screen)
 wall_two = rectangleWallObject((64,64), screen)
 wall_three = rectangleWallObject((96,64), screen)
 wall_four = rectangleWallObject((128,64), screen)
@@ -47,6 +47,10 @@ wall_seven = rectangleWallObject((64, 160), screen)
 wall_eight = rectangleWallObject((128,96), screen)
 wall_nine = rectangleWallObject((128, 160), screen)
 wall_ten = rectangleWallObject((96, 160), screen)
+wall_eleven = rectangleWallObject((200, 200), screen)
+wall_twelve = rectangleWallObject((230, 300), screen)
+
+# NAVMESH GENERATION
 
 
 # GAME LOOP

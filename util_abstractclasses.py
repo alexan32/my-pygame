@@ -1,4 +1,6 @@
 import logging
+import gamemath
+import environment
 from util_functions import (
     collidable_list, 
     add_collidable_to_list,
@@ -75,6 +77,4 @@ class collidableClass:
 
     def render_hitbox(self):
         self.hitbox.render()
-
-    
 

@@ -10,6 +10,7 @@ from pygame import(
     K_s,
     K_w,
     K_e,
+    K_DELETE,
     key,
     mouse
 )
@@ -31,9 +32,10 @@ class controller:
             'down' : False,
             'attack' : False,
             'quit' : False,
-            'mouse_pos' : (0,0),
+            'mouse_position' : (0,0),
             'mouse_buttons' : (False, False, False),
-            'mouse_held' : False
+            'mouse_held' : False,
+            'clear_navigation' : False
         }
         self.key_map = {
             'left' : K_LEFT,
@@ -41,7 +43,8 @@ class controller:
             'up' : K_UP,
             'down' : K_DOWN,
             'attack' : K_e,
-            'quit': K_ESCAPE
+            'quit': K_ESCAPE,
+            'clear_navigation' : K_DELETE
         }
         self.alt_map = {
             'left' : K_a,
@@ -68,8 +71,9 @@ class controller:
         self.input['down'] = key[self.key_map['down']] or key[self.alt_map['down']]
         self.input['attack'] = key[self.key_map['attack']]
         self.input['quit'] =  key[self.key_map['quit']]
+        self.input['clear_navigation'] = key[self.key_map['clear_navigation']]
         
-        self.input['mouse_pos'] = mouse.get_pos()
+        self.input['mouse_position'] = mouse.get_pos()
         self.input['mouse_buttons'] = mouse.get_pressed()
 
 
