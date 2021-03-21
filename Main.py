@@ -1,12 +1,9 @@
 import pygame
 import logging
 import environment
-from controller import controller
-from util_classes import *
-from util_functions import *
-from player import playerObject
-from wall import wallObject, movableObject, movableMover, rectangleWallObject
-
+from gamefunc import loadGridFromPath
+from controller import Controller
+from classes import *
 
 # LOGGING
 logger=logging.getLogger() 
@@ -15,15 +12,14 @@ logger.setLevel(environment.LOG_LEVEL)
 # PYGAME VARIABLES
 version = 'my-pygame-v0.01'
 fullscreen = False
-running = True
 monitor_size = 1920, 1080 
 size = width, height = environment.SCREEN_WIDTH, environment.SCREEN_HEIGHT
 background = 50, 50, 50
 fps = environment.FPS
 clock = pygame.time.Clock()
+player_controller = Controller()
 
-
-# GAME INITIALIZATION      
+# INIT
 pygame.init()
 if fullscreen:
     screen = pygame.display.set_mode(size, pygame.FULLSCREEN)
@@ -32,50 +28,36 @@ else:
 pygame.display.set_caption(version)
 
 
-# OBJECT INIT
-player_controller = controller()
+worldGrid = loadGridFromPath('./resources/level/map.json')
 
-player = playerObject((300,300), player_controller, screen)
+def main():
+    # GAME LOOP
+    running = True
+    while running:
+        dt = clock.tick(fps)
 
-# wall = wallObject((200,200), screen)
-wall_two = rectangleWallObject((64,64), screen)
-wall_three = rectangleWallObject((96,64), screen)
-wall_four = rectangleWallObject((128,64), screen)
-wall_five = rectangleWallObject((64,96), screen)
-wall_six = rectangleWallObject((64,128), screen)
-wall_seven = rectangleWallObject((64, 160), screen)
-wall_eight = rectangleWallObject((128,96), screen)
-wall_nine = rectangleWallObject((128, 160), screen)
-wall_ten = rectangleWallObject((96, 160), screen)
-wall_eleven = rectangleWallObject((200, 200), screen)
-wall_twelve = rectangleWallObject((230, 300), screen)
+        key = pygame.key.get_pressed()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
 
-# NAVMESH GENERATION
+        update(dt)
+        render(dt)
 
 
-# GAME LOOP
-while running:
-
-    dt = clock.tick(fps)
-
-    # UPDATE----------------------------
-    key = pygame.key.get_pressed()
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT or (event.type is pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
-            running = False
-
+def update(dt):
     player_controller.update(dt)
 
-    for key in gameobject_dict:
-        gameobject_dict[key].update(dt)
 
-
-    # RENDER----------------------------
+def render(dt):
     screen.fill(background)
 
-    for key in gameobject_dict:
-        gameobject_dict[key].render()
+    for y in range(len(worldGrid)):
+        for x in range(len(worldGrid[y])):
+            worldGrid[y][x].render(screen, x * environment.TILE_WIDTH, y * environment.TILE_HEIGHT)
 
     pygame.display.update()
 
-    # pygame.transform.scale(screen, monitor_size, fullscreen)
+
+if __name__ == "__main__":
+    main()

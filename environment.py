@@ -9,5 +9,7 @@ SCREEN_WIDTH = 640
 SCREEN_HEIGHT = 480
 FPS = 60
 SPRITE_SIZE = 32
+TILE_WIDTH = 16
+TILE_HEIGHT = 16
 NAVIGATION_TOLERANCE = 5
 CIRCLE_EDGES = 8                # number of edges to give a circle when creating navmesh

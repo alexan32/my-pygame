@@ -22,7 +22,7 @@ hold_sensitivity = 200
 # CONTROLLER
 # ---------------------------------------------------------------------
 
-class controller:
+class Controller:
 
     def __init__(self):
         self.input = {
