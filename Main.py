@@ -35,8 +35,7 @@ def main():
     running = True
     while running:
         dt = clock.tick(fps)
-
-        key = pygame.key.get_pressed()
+        
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False

@@ -48,8 +48,8 @@ class TileMap():
         sourceImageWidth, sourceImageHeight = temp.get_rect().size
         self.sourceImage = temp.convert_alpha()
         self.tileSurfaces = []
-        for x in range(len(sourceImageWidth / tileWidth)):
-            for y in range(len(sourceImageHeight / tileHeight)):
+        for y in range(int(sourceImageHeight / tileHeight)):
+            for x in range(int(sourceImageWidth / tileWidth)):
                 left, top = x * tileWidth, y * tileHeight
                 tile = pygame.Surface((tileWidth, tileHeight))
                 tile.blit(self.sourceImage, (0,0), pygame.Rect(left, top, tileWidth, tileHeight))

@@ -13,7 +13,7 @@ def loadGridFromPath(path, tileWidth=None, tileHeight=None):
     tileMap = TileMap(f"./resources/images/tiles/{_map['tileset']}", tileWidth, tileHeight)
 
     # build grid
-    gridJson = _map['map']
+    gridJson = _map['grid']
     grid = []
     for y in range(len(gridJson)):
         grid.append([])
