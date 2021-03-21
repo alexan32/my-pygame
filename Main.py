@@ -1,7 +1,7 @@
 import pygame
 import logging
 import environment
-from gamefunc import loadGridFromPath
+from gamefunc import loadWorldDataFromPath
 from controller import Controller
 from classes import *
 
@@ -18,6 +18,7 @@ background = 50, 50, 50
 fps = environment.FPS
 clock = pygame.time.Clock()
 player_controller = Controller()
+emptyEvents = {"mouse": None}
 
 # INIT
 pygame.init()
@@ -26,9 +27,14 @@ if fullscreen:
 else:
     screen = pygame.display.set_mode(size)
 pygame.display.set_caption(version)
+pygame.mouse.set_cursor(pygame.cursors.arrow)
 
 
-worldGrid = loadGridFromPath('./resources/level/map.json')
+worldGrid = Grid(loadWorldDataFromPath('./resources/level/map.json'))
+print(worldGrid.getNeighbors(1, 1))
+
+# tileIndicator = TileIndicator('./resources/images/tiles/indicator.png')
+player = GridAgent(6, worldGrid)
 
 def main():
     # GAME LOOP
@@ -36,24 +42,40 @@ def main():
     while running:
         dt = clock.tick(fps)
         
+        eventBus = emptyEvents.copy()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+            if event.type == pygame.MOUSEBUTTONUP:
+                eventBus['mouse'] = pygame.mouse.get_pos()
 
-        update(dt)
+        update(dt, eventBus)
         render(dt)
 
 
-def update(dt):
+def update(dt, eventBus):
     player_controller.update(dt)
+    x, y = pygame.mouse.get_pos()
+
+
+
+    tileX, tileY = int(x / environment.TILE_WIDTH), int(y / environment.TILE_HEIGHT)
+    # tileIndicator.set_position(tileX * environment.TILE_WIDTH, tileY * environment.TILE_HEIGHT)
 
 
 def render(dt):
     screen.fill(background)
 
-    for y in range(len(worldGrid)):
-        for x in range(len(worldGrid[y])):
-            worldGrid[y][x].render(screen, x * environment.TILE_WIDTH, y * environment.TILE_HEIGHT)
+    # improve with blits?
+    for y in range(worldGrid.height):
+        for x in range(worldGrid.width):
+            cell = worldGrid.getCell(x, y)
+            if cell != None:
+                cell.render(screen, x * environment.TILE_WIDTH, y * environment.TILE_HEIGHT)
+
+    player.render(screen)
+
+    # tileIndicator.render(screen)
 
     pygame.display.update()
 

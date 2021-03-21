@@ -1,9 +1,9 @@
 import json
 import environment
-from classes import TileMap, Tile
+from classes import TileMap, TileSurface
 
 
-def loadGridFromPath(path, tileWidth=None, tileHeight=None):
+def loadWorldDataFromPath(path, tileWidth=None, tileHeight=None):
     with open(path) as f:
         _map = json.load(f)
 
@@ -19,6 +19,6 @@ def loadGridFromPath(path, tileWidth=None, tileHeight=None):
         grid.append([])
         for x in range(len(gridJson[y])):
             surface = tileMap.getSurface(gridJson[y][x])
-            grid[y].append(Tile(surface, None))
+            grid[y].append(TileSurface(surface))
 
     return grid
