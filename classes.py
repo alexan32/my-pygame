@@ -1,5 +1,7 @@
 import pygame
 import logging
+import copy
+import environment
 
 # LOGGING
 logger=logging.getLogger() 
@@ -72,11 +74,11 @@ class TileSurface():
 
 
 """
-basically a wrapper around a 2d list
+basically a wrapper around a 2d list for building the map/performing pathfinding
 """
 class Grid():
 
-    def __init__(self, list2d, initialCount=0):
+    def __init__(self, list2d):
         self.values = []
         self.height = len(list2d)
         self.width = len(list2d[0])
@@ -94,6 +96,61 @@ class Grid():
         except:
             return None
 
+    def setCell(self, x, y, value):
+        self.values[y][x] = value
+
+
+"""
+Grid that provides functionality for pathfinding. expects a 2d list with a value of
+-1 for each tile that is not passable, and a high number for walkable tiles. 
+    ie:     99 99 99 99
+            99 -1 99 99
+            99 -1 -1 99
+            99 99 99 99
+"""
+class CollisionGrid(Grid):
+
+    def __init__(self, list2d):
+        super().__init__(list2d)
+
+    def getReachableTiles(self, startX, startY, movement):     
+        collisionList = copy.deepcopy(self.values)
+        collisionList [startY][startX] = 0
+
+        for row in collisionList:
+            rowString = ""
+            for val in row:
+                rowString += f"{val}".ljust(4)
+            print(rowString)
+
+        queue = [(startX, startY)]
+        reachable = []
+
+        while len(queue) > 0:
+            currentNode = queue.pop(0)
+            currentNodeValue = collisionList[currentNode[1]][currentNode[0]]
+
+            neighbors = self.getNeighbors(currentNode[0], currentNode[1])
+
+            for neighbor in neighbors:
+                value = collisionList[neighbor[1]][neighbor[0]]
+                moveCost = 1.5 if neighbor[0] - currentNode[0] != 0 and neighbor[1] - currentNode[1] != 0 else 1.0
+                if value > currentNodeValue + moveCost and currentNodeValue + moveCost <= movement:
+                    collisionList[neighbor[1]][neighbor[0]] = currentNodeValue + moveCost
+                    queue.append(neighbor)
+
+            if currentNode not in reachable:
+                reachable.append(currentNode)
+        
+        print()
+        for row in collisionList:
+            rowString = ""
+            for val in row:
+                rowString += f"{val}".ljust(4)
+            print(rowString)
+
+        return reachable
+
     def getNeighbors(self, x, y):
         neighbors = []
         reachable = lambda x, y: x >= 0 and x < self.width and y >= 0 and y < self.height
@@ -107,9 +164,15 @@ class Grid():
             neighbors.append((x, y-1))
         if reachable(x, y+1):
             neighbors.append((x, y+1))
+        if reachable(x-1, y-1):
+            neighbors.append((x-1, y-1))
+        if reachable(x-1, y+1):
+            neighbors.append((x-1, y+1))
+        if reachable(x+1, y-1):
+            neighbors.append((x+1, y-1))
+        if reachable(x+1, y+1):
+            neighbors.append((x+1, y+1))
         return neighbors
-
-        
 
 
 """Drawn onto the screen to show which tile the mouse is currently over"""
@@ -125,22 +188,23 @@ class TileIndicator(Position):
             self.image.render(screen, self.x, self.y)
 
 
-class GridAgent(Position):
+class GridAgent():
 
-    def __init__(self, movement, grid):
-        super().__init__()
-        self.grid = grid
+    def __init__(self, movement):
         self.gridPosition = 0, 0
         self.movement = movement
         self.image = Image("./resources/images/characters/player.png")
         self.tileIndicator = TileIndicator("./resources/images/tiles/indicator.png")
         self.showMovement = False
+        self.availableMovement = []
 
-    def findMoves(self):
-        visited = {
-            str(self.gridPosition[0], self.gridPosition[1]): {"x": self.gridPosition[0], "y": self.gridPosition[1], "cost": 0}
-        }
-
+    def getAvailableMovement(self, collisionGrid):
+        self.availableMovement = collisionGrid.getReachableTiles(self.gridPosition[0], self.gridPosition[1], self.movement)
 
     def render(self, screen):
-        self.image.render(screen, self.x, self.y)
+        self.image.render(screen, self.gridPosition[0] * environment.TILE_WIDTH, self.gridPosition[1] * environment.TILE_HEIGHT)
+
+        if self.showMovement:
+            for coords in self.availableMovement:
+                self.tileIndicator.set_position(coords[0] * environment.TILE_WIDTH, coords[1]* environment.TILE_HEIGHT)
+                self.tileIndicator.render(screen)

@@ -30,11 +30,12 @@ pygame.display.set_caption(version)
 pygame.mouse.set_cursor(pygame.cursors.arrow)
 
 
-worldGrid = Grid(loadWorldDataFromPath('./resources/level/map.json'))
-print(worldGrid.getNeighbors(1, 1))
+worldGrid = loadWorldDataFromPath('./resources/level/map.json')
 
-# tileIndicator = TileIndicator('./resources/images/tiles/indicator.png')
-player = GridAgent(6, worldGrid)
+player = GridAgent(4)
+player.gridPosition = 4, 4
+player.getAvailableMovement(worldGrid['collision'])
+player.showMovement = True
 
 def main():
     # GAME LOOP
@@ -57,21 +58,21 @@ def update(dt, eventBus):
     player_controller.update(dt)
     x, y = pygame.mouse.get_pos()
 
-
-
-    tileX, tileY = int(x / environment.TILE_WIDTH), int(y / environment.TILE_HEIGHT)
-    # tileIndicator.set_position(tileX * environment.TILE_WIDTH, tileY * environment.TILE_HEIGHT)
+    if eventBus['mouse'] != None:
+        # tileIndicator.set_position(tileX * environment.TILE_WIDTH, tileY * environment.TILE_HEIGHT)
+        player.gridPosition = int(x / environment.TILE_WIDTH), int(y / environment.TILE_HEIGHT)
+        player.getAvailableMovement(worldGrid['collision'])
 
 
 def render(dt):
     screen.fill(background)
 
     # improve with blits?
-    for y in range(worldGrid.height):
-        for x in range(worldGrid.width):
-            cell = worldGrid.getCell(x, y)
-            if cell != None:
-                cell.render(screen, x * environment.TILE_WIDTH, y * environment.TILE_HEIGHT)
+    for y in range(worldGrid['layer_1'].height):
+        for x in range(worldGrid['layer_1'].width):
+            tile = worldGrid['layer_1'].getCell(x, y)
+            if tile != None:
+                tile.render(screen, x * environment.TILE_WIDTH, y * environment.TILE_HEIGHT)
 
     player.render(screen)
 
